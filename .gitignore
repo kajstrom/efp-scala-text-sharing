@@ -1,0 +1,11 @@
+logs
+target
+.vagrant
+.g8
+.gradle
+/.idea
+/.idea_modules
+/.classpath
+/.project
+/.settings
+/RUNNING_PID
