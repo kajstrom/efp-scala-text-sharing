@@ -63,6 +63,35 @@ class HomeController @Inject()(val messagesApi: MessagesApi) extends Controller 
 
       Ok(views.html.view(shared(key), key))
   }
+
+  def edit(key: String) = Action {
+    implicit request =>
+      val r = new RedisClient("localhost", 6379)
+      val shared = r.hmget("shared", key).get
+      r.disconnect
+
+      Ok(views.html.edit(key, shareForm.fill(SharedData(shared(key)))))
+  }
+
+  def saveEdit(key: String) = Action {
+    implicit request =>
+      val errorFunction = { formWithErrors: Form[SharedData] =>
+        Redirect(routes.HomeController.edit(key)).flashing("info" -> "Editing text failed! Try again!")
+      }
+
+      val successFunction = { data: SharedData =>
+        val key = Random.alphanumeric.take(10).mkString
+
+        val r = new RedisClient("localhost", 6379)
+        r.hmset("shared", Map(key -> data.text))
+        r.disconnect
+
+        Redirect(routes.HomeController.view(key))
+      }
+
+      val formValidationResult = shareForm.bindFromRequest
+      formValidationResult.fold(errorFunction, successFunction)
+  }
 }
 
 case class SharedData(text: String)

@@ -1,0 +1,11 @@
+@(key: String, form: Form[SharedData])(implicit request: RequestHeader, messages: Messages)
+
+@main("Welcome to Text Sharing App") {
+<h1>Edit shared text</h1>
+
+@helper.form(action = routes.HomeController.saveEdit(key)) {
+    @helper.CSRF.formField
+    @helper.textarea(form("text"))
+    <button type="submit">Share</button>
+}
+}
