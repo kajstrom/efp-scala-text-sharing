@@ -48,11 +48,20 @@ class HomeController @Inject()(val messagesApi: MessagesApi) extends Controller 
         r.hmset("shared", Map(key -> data.text))
         r.disconnect
 
-        Redirect(routes.HomeController.index()).flashing("info" -> "Text shared!")
+        Redirect(routes.HomeController.view(key))
       }
 
       val formValidationResult = shareForm.bindFromRequest
       formValidationResult.fold(errorFunction, successFunction)
+  }
+
+  def view(key: String) = Action {
+    implicit request =>
+      val r = new RedisClient("localhost", 6379)
+      val shared = r.hmget("shared", key).get
+      r.disconnect
+
+      Ok(views.html.view(shared(key), key))
   }
 }
 
