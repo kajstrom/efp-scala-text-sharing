@@ -1,5 +1,16 @@
-@()
+@(form: Form[SharedData])(implicit request: RequestHeader, messages: Messages)
 
-@main("Welcome to Play") {
-  <h1>Welcome to Play!</h1>
+@main("Welcome to Text Sharing App") {
+  <h1>Welcome to text sharing app!</h1>
+
+  @request.flash.data.map{ case (name, value) =>
+    <div class="@name">@value</div>
+  }
+
+  <h2>Share some content:</h2>
+  @helper.form(action = routes.HomeController.share()) {
+    @helper.CSRF.formField
+    @helper.textarea(form("text"))
+    <button type="submit">Share</button>
+  }
 }
